@@ -28,13 +28,27 @@ class App extends Component {
   async loadBlockChainData() {
     const web3 = window.web3
     const accounts = await web3.eth.getAccounts()
-    console.log("account", accounts[0])
+    this.setState({ account: accounts[0] })
+
+    //load smart contract
+    const networkId = await web3.eth.net.getId()
+    const networkData = MemoryToken.networks[networkId]
+    if(networkData){
+      const abi = MemoryToken.abi
+      const address = networkData.address
+      const token = new web3.eth.Contract(abi, address)
+      this.setState({ token })
+
+    } else {
+      alert('Smart contract not deployed to detected network')
+    }
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      account: '0x0'
+      account: '0x0',
+      token: {},
     }
   }
 
